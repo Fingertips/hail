@@ -1,3 +1,6 @@
+require 'rubygems' rescue LoadError
+
+require 'active_support'
 require 'optparse'
 
 require 'hail/workbench'

@@ -1,7 +1,5 @@
 require File.expand_path('../helper.rb', __FILE__)
 
-require 'hail'
-
 require 'receptor'
 require 'stdout_receptor'
 

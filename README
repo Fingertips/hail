@@ -6,4 +6,4 @@ Hail is a simple tool to sync Git and Subversion repositories.
   $ cd hail
   $ hail sync
 
-Hail depends on "rsync":http://samba.anu.edu.au/rsync/ and "Ruby":http://www.ruby-lang.org.
+Hail depends on Subversion, Git, Rsync, Ruby and ActiveSupport.
