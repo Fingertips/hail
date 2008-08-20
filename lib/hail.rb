@@ -4,6 +4,7 @@ require 'active_support'
 require 'optparse'
 
 require 'hail/workbench'
+require 'hail/repository'
 
 module Hail
   VERSION = '0.6.0'
