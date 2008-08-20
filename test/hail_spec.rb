@@ -3,7 +3,7 @@ require File.expand_path('../helper.rb', __FILE__)
 require 'receptor'
 require 'stdout_receptor'
 
-describe "Hail, invoked from the commandline" do
+describe "Hail, invoked from the commandline, without a command" do
   include StdOutReceptor
   
   before do
@@ -36,6 +36,21 @@ describe "Hail, invoked from the commandline" do
     Hail.stubs(:run_command).returns(false)
     Hail.expects(:exit).with(-1)
     Hail.run([]).should == {}
+  end
+end
+
+describe "Hail, invoked from the commandline" do
+  include StdOutReceptor
+  
+  before do
+    Receptor.instance.messages.clear
+    Hail.stubs(:exit)
+  end
+  
+  it "should parse a basic init invocation" do
+    options = {:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk', :directory => '.'}
+    Hail::Workbench.expects(:init).with(options)
+    Hail.run('init --name hail git://github.com/Fingertips/hail.git https://fngtps.com/svn/hail/trunk .'.split(' '))
   end
 end
 

@@ -15,8 +15,16 @@ describe "Workbench" do
   end
   
   it "should initialize a new workbench on disk" do
-    workbench = Hail::Workbench.init(:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk')
+    workbench = Hail::Workbench.init(:name => 'hail')
     File.exist?(workbench.directory).should == true
+  end
+  
+  it "should expand path expressions properly" do
+    Hail::Workbench.expand_path(nil).should == Hail::Workbench.basedir
+    Hail::Workbench.expand_path('.').should == Hail::Workbench.basedir
+    Hail::Workbench.expand_path('~').should == File.expand_path('~')
+    Hail::Workbench.expand_path('/tmp').should == File.expand_path('/tmp')
+    Hail::Workbench.expand_path('hail/one').should == File.join(Hail::Workbench.basedir, 'hail/one')
   end
 end
 
@@ -38,5 +46,15 @@ describe "A Workbench" do
     File.exist?(@workbench.directory).should == false
     @workbench.ensure_directory
     File.exist?(@workbench.directory).should == true
+  end
+  
+  it "should prefer a provided directory over the default directory" do
+    @workbench.directory = '/var/lib/hail/myproject'
+    @workbench.directory.should == '/var/lib/hail/myproject'
+  end
+  
+  it "should switch back to the default directory when the provided directory is nil" do
+    @workbench.directory = nil
+    @workbench.directory.should.start_with(Hail::Workbench.basedir)
   end
 end

@@ -9,7 +9,15 @@ module Hail
   VERSION = '0.6.0'
   
   def self.run_command(options={})
-    if options[:command] == 'init'
+    command = options.delete(:command)
+    rest    = options.delete(:rest)
+    
+    if command == 'init'
+      unless rest.blank?
+        options[:original] = rest.shift
+        options[:clone] = rest.shift
+        options[:directory] = rest.shift
+      end
       Workbench.init(options)
     end
   end
@@ -18,6 +26,11 @@ module Hail
     options = {}
     opts = OptionParser.new do |opts|
       opts.banner = 'Usage: hail [options] <command> [repository1] [respository2]'
+      
+      opts.on( "-n", "--name [NAME]", String,
+               "Set the name for the workbench" ) do |n|
+        options[:name] = n
+      end
       
       opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
         options[:verbose] = v
@@ -35,10 +48,13 @@ module Hail
     end
     opts.parse!(args)
     
+    options[:command] = args.shift unless args.empty?
+    options[:rest] = args unless args.empty?
+    
     unless run_command(options)
       exit -1
     end
-    
+     
     options
   end
 end
