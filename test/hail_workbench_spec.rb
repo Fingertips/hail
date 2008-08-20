@@ -17,6 +17,7 @@ describe "Workbench" do
   it "should initialize a new workbench on disk" do
     workbench = Hail::Workbench.init(:name => 'hail')
     File.exist?(workbench.directory).should == true
+    File.exist?(workbench.config_file).should == true
   end
   
   it "should expand path expressions properly" do
@@ -56,5 +57,21 @@ describe "A Workbench" do
   it "should switch back to the default directory when the provided directory is nil" do
     @workbench.directory = nil
     @workbench.directory.should.start_with(Hail::Workbench.basedir)
+  end
+  
+  it "should know it's own configuration file" do
+    @workbench.config_file.should.start_with(@workbench.directory)
+    @workbench.config_file.should.end_with('config.yml')
+  end
+  
+  it "should be able to write it's configuration file" do
+    @workbench.ensure_directory
+    File.exist?(@workbench.config_file).should == false
+    @workbench.write_configuration
+    File.size(@workbench.config_file).should > 0
+  end
+  
+  it "should have a configuration hash" do
+    @workbench.to_hash.should.not.be.empty
   end
 end

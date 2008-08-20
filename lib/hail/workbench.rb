@@ -3,13 +3,19 @@ require 'fileutils'
 
 module Hail
   class Workbench
-    attr_accessor :name, :directory
+    attr_accessor :name, :directory, :original, :clone
     
     def initialize(options={})
       @name = options[:name]
-      if options[:directory]
-        @directory = File.join(self.class.expand_path(options[:directory]), @name)
-      end
+      @directory = self.class.expand_path(
+        if options[:directory]
+          options[:directory]
+        elsif @name
+          @name
+        end
+      )
+      @original = options[:original]
+      @clone = options[:clone]
     end
     
     def directory
@@ -20,9 +26,24 @@ module Hail
       FileUtils.mkdir_p(directory)
     end
     
+    def config_file
+      File.join(directory, 'config.yml')
+    end
+    
+    def write_configuration
+      File.open(config_file, 'w') do |file|
+        file.write(to_hash.to_yaml)
+      end
+    end
+    
+    def to_hash
+      {'original' => original, 'clone' => clone}
+    end
+    
     def self.init(options={})
       workbench = new(options)
       workbench.ensure_directory
+      workbench.write_configuration
       workbench
     end
     
