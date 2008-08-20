@@ -1,0 +1,9 @@
+Hail
+
+Hail is a simple tool to sync Git and Subversion repositories.
+
+  $ hail init -n hail git://github.com/Fingertips/hail.git https://fngtps.com/svn/hail/trunk
+  $ cd hail
+  $ hail sync
+
+Hail depends on "rsync":http://samba.anu.edu.au/rsync/ and "Ruby":http://www.ruby-lang.org.
