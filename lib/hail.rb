@@ -1,7 +1,15 @@
 require 'optparse'
 
+require 'hail/workbench'
+
 module Hail
   VERSION = '0.6.0'
+  
+  def self.run_command(options={})
+    if options[:command] == 'init'
+      Workbench.init(options)
+    end
+  end
   
   def self.run(args)
     options = {}
@@ -23,6 +31,11 @@ module Hail
       end
     end
     opts.parse!(args)
+    
+    unless run_command(options)
+      exit -1
+    end
+    
     options
   end
 end
