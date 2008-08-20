@@ -15,7 +15,9 @@ describe "Workbench" do
   end
   
   it "should initialize a new workbench on disk" do
-    workbench = Hail::Workbench.init(:name => 'hail')
+    Hail::Repository.any_instance.stubs(:execute)
+    
+    workbench = Hail::Workbench.init(:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk')
     File.exist?(workbench.directory).should == true
     File.exist?(workbench.config_file).should == true
   end
