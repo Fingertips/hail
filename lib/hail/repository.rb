@@ -8,7 +8,10 @@ module Hail
     end
     
     def scm
-      self.class.recognize_scm(directory)
+      unless scm = self.class.recognize_scm(directory)
+        scm = location.ends_with?('git') ? 'git' : 'svn'
+      end
+      scm
     end
     
     def get
@@ -34,6 +37,7 @@ module Hail
     end
     
     def self.recognize_scm(directory)
+      return nil if directory.nil?
       if File.exist?(File.join(directory, '.git'))
         'git'
       elsif File.exist?(File.join(directory, '.svn'))

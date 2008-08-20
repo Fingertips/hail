@@ -14,8 +14,8 @@ module Hail
           @name
         end
       )
-      @original = options[:original]
-      @clone = options[:clone]
+      @original = Repository.new(:location => options[:original], :directory => File.join(directory, 'original'))
+      @clone = Repository.new(:location => options[:clone], :directory => File.join(directory, 'clone'))
     end
     
     def directory
@@ -37,13 +37,19 @@ module Hail
     end
     
     def to_hash
-      {'original' => original, 'clone' => clone}
+      {'original' => original.location, 'clone' => clone.location}
+    end
+    
+    def get_repositories
+      original.get
+      clone.get
     end
     
     def self.init(options={})
       workbench = new(options)
       workbench.ensure_directory
       workbench.write_configuration
+      workbench.get_repositories
       workbench
     end
     
