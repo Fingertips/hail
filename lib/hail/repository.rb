@@ -22,6 +22,8 @@ module Hail
       case scm
       when 'git'
         execute "git clone #{location} #{directory}"
+        execute_in_directory "git config branch.master.remote 'origin'"
+        execute_in_directory "git config branch.master.merge 'refs/heads/master'"
       when 'svn'
         execute "svn checkout #{location} #{directory}"
       end
@@ -86,6 +88,7 @@ module Hail
     end
     
     def execute(command)
+      puts "[Execute] #{command}"
       `#{command}`
     end
     

@@ -51,14 +51,17 @@ module Hail
       clone.get
     end
     
-    def sync_repositories
+    def update_repositories
       original.update
-      rsync
-      clone.put("Updated to #{original.revision}.")
+      clone.update
     end
     
-    def rsync
+    def sync_repositories
       execute "rsync -av --exclude-from='#{excludes_filename}' #{original.directory}/ #{clone.directory}"
+    end
+    
+    def put_clone
+      clone.put("Updated to #{original.revision}.")
     end
     
     def excludes_filename
@@ -74,11 +77,14 @@ module Hail
       write_configuration
       get_repositories
       sync_repositories
+      put_clone
     end
     
     def update
       read_configuration
+      update_repositories
       sync_repositories
+      put_clone
     end
     
     def self.init(options={})

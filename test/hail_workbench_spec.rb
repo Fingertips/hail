@@ -87,17 +87,20 @@ describe "A Workbench" do
     @workbench.get_repositories
   end
   
-  it "should sync repositories" do
+  it "should update repositories" do
     @workbench.original.expects(:update)
-    @workbench.original.stubs(:revision).returns('b264a3c8836311974620d7be7a8edca1730027bb')
-    @workbench.expects(:rsync)
-    @workbench.clone.expects(:put).with("Updated to b264a3c8836311974620d7be7a8edca1730027bb.")
+    @workbench.clone.expects(:update)
+    @workbench.update_repositories
+  end
+  
+  it "should sync repositories" do
+    @workbench.expects(:execute).with("rsync -av --exclude-from='#{@workbench.excludes_filename}' #{@workbench.original.directory}/ #{@workbench.clone.directory}")
     @workbench.sync_repositories
   end
   
-  it "should rsync original to clone" do
-    @workbench.expects(:execute).with("rsync -av --exclude-from='#{@workbench.excludes_filename}' #{@workbench.original.directory}/ #{@workbench.clone.directory}")
-    @workbench.rsync
+  it "should put the clone (commit)" do
+    @workbench.clone.expects(:put).with("Updated to #{@workbench.original.revision}.")
+    @workbench.put_clone
   end
   
   it "should know where the file with rsync excludes are" do
@@ -124,12 +127,15 @@ describe "A Workbench" do
     @workbench.expects(:write_configuration)
     @workbench.expects(:get_repositories)
     @workbench.expects(:sync_repositories)
+    @workbench.expects(:put_clone)
     @workbench.init
   end
   
   it "should update" do
     @workbench.expects(:read_configuration)
+    @workbench.expects(:update_repositories)
     @workbench.expects(:sync_repositories)
+    @workbench.expects(:put_clone)
     @workbench.update
   end
 end

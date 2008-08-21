@@ -36,7 +36,8 @@ describe "A Git Repository" do
   end
   
   it "should get a new version of itself" do
-    @repository.expects(:execute).with("git clone #{@repository.location} #{@repository.directory}")
+    # TODO: Find a way to test for three separate executes
+    @repository.expects(:execute).times(3)
     @repository.get
   end
   
