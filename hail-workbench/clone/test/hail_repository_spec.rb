@@ -47,8 +47,7 @@ describe "A Git Repository" do
   
   it "should put (commit) itself" do
     message = 'Pushing changes.'
-    # TODO: Find a way to test for two separate executes
-    @repository.expects(:execute).times(2)
+    @repository.expects(:execute).with("cd #{@repository.directory}; git commit -a -v -m '#{message}'; git push origin master")
     @repository.put(message)
   end
   

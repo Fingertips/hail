@@ -43,7 +43,6 @@ module Hail
       
       case scm
       when 'git'
-        execute "cd #{directory}; git add ."
         execute "cd #{directory}; git commit -a -v -m '#{commit_message}'; git push origin master"
       when 'svn'
         execute "cd #{directory}; svn add `svn status | grep -e \"^\?\" | cut -c 8-`"
