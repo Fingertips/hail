@@ -1,7 +1,0 @@
-Hail
-
-Hail is a simple tool to sync Git and Subversion repositories.
-
-  $ hail init git://github.com/Fingertips/hail.git https://fngtps.com/svn/hail/trunk hail-workbench
-
-Hail depends on Subversion, Git, Rsync, Ruby and ActiveSupport.
