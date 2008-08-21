@@ -48,9 +48,9 @@ describe "Hail, invoked from the commandline" do
   end
   
   it "should parse a basic init invocation" do
-    options = {:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk', :directory => '.'}
+    options = {:original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk', :directory => '.'}
     Hail::Workbench.expects(:init).with(options)
-    Hail.run('init --name hail git://github.com/Fingertips/hail.git https://fngtps.com/svn/hail/trunk .'.split(' '))
+    Hail.run('init git://github.com/Fingertips/hail.git https://fngtps.com/svn/hail/trunk .'.split(' '))
   end
   
   it "should parse a basic update invocation" do
