@@ -32,9 +32,9 @@ module Hail
       
       case scm
       when 'git'
-        execute "cd #{directory}; git pull --rebase"
+        execute_in_directory "git pull --rebase"
       when 'svn'
-        execute "cd #{directory}; svn update"
+        execute_in_directory "svn update"
       end
     end
     
@@ -43,12 +43,16 @@ module Hail
       
       case scm
       when 'git'
-        execute "cd #{directory}; git add ."
-        execute "cd #{directory}; git commit -a -v -m '#{commit_message}'; git push origin master"
+        unless File.exist?(File.join(directory, '.git', 'config'))
+          execute_in_directory "git init"
+          execute_in_directory "git remote add origin #{location}"
+        end
+        execute_in_directory "git add ."
+        execute_in_directory "git commit -a -v -m '#{commit_message}'; git push origin master"
       when 'svn'
-        execute "cd #{directory}; svn add `svn status | grep -e \"^\?\" | cut -c 8-`"
-        execute "cd #{directory}; for file in `svn status | grep -e \"^\!\" | cut -c 8-`; do svn remove --force '$file' &> /dev/null done"
-        execute "cd #{directory}; svn commit -m '#{commit_message}'"
+        execute_in_directory "svn add `svn status | grep -e \"^\?\" | cut -c 8-`"
+        execute_in_directory "for file in `svn status | grep -e \"^\!\" | cut -c 8-`; do svn remove --force '$file' &> /dev/null done"
+        execute_in_directory "svn commit -m '#{commit_message}'"
       end
     end
     
@@ -57,14 +61,14 @@ module Hail
         case scm
         when 'git'
           begin
-            lastlog = execute "cd #{directory}; git log -n 1 --no-color --pretty=oneline"
+            lastlog = execute_in_directory "git log -n 1 --no-color --pretty=oneline"
             lastlog.strip.split(' ').first
           rescue NoMethodError
             nil
           end
         when 'svn'
           begin
-            lastlog = execute "cd #{directory}; svn log -r HEAD"
+            lastlog = execute_in_directory "svn log -r HEAD"
             lastlog.strip.split("\n")[1].split(' ').first[1..-1]
           rescue NoMethodError
             nil
@@ -83,6 +87,10 @@ module Hail
     
     def execute(command)
       `#{command}`
+    end
+    
+    def execute_in_directory(command)
+      execute "cd #{directory}; #{command}"
     end
     
     def self.recognize_scm(directory)
