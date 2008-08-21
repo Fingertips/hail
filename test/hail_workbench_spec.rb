@@ -14,21 +14,24 @@ describe "Workbench" do
     Hail::Workbench.basedir = old_value
   end
   
-  it "should initialize a new workbench on disk" do
-    Hail::Repository.any_instance.stubs(:execute)
-    Hail::Workbench.any_instance.stubs(:execute)
-    
-    workbench = Hail::Workbench.init(:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk')
-    File.exist?(workbench.directory).should == true
-    File.exist?(workbench.config_file).should == true
-  end
-  
   it "should expand path expressions properly" do
     Hail::Workbench.expand_path(nil).should == Hail::Workbench.basedir
     Hail::Workbench.expand_path('.').should == Hail::Workbench.basedir
     Hail::Workbench.expand_path('~').should == File.expand_path('~')
     Hail::Workbench.expand_path('/tmp').should == File.expand_path('/tmp')
     Hail::Workbench.expand_path('hail/one').should == File.join(Hail::Workbench.basedir, 'hail/one')
+  end
+  
+  it "should initialize a new workbench on disk" do
+    Hail::Workbench.any_instance.expects(:init)
+    workbench = Hail::Workbench.init(:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk')
+    workbench.should.be.kind_of?(Hail::Workbench)
+  end
+  
+  it "should update a workbench" do
+    Hail::Workbench.any_instance.expects(:update)
+    workbench = Hail::Workbench.update(:directory => File.join(TEST_ROOT, 'repositories'))
+    workbench.should.be.kind_of?(Hail::Workbench)
   end
 end
 
@@ -101,5 +104,32 @@ describe "A Workbench" do
     @workbench.excludes_filename.should.start_with(Hail::APP_ROOT)
     @workbench.excludes_filename.should.end_with('excludes')
     File.exists?(@workbench.excludes_filename).should == true
+  end
+  
+  it "should read it's configuration" do
+    config = {'original' => 'git://github.com/Fingertips/hail.git', 'clone' => 'https://fngtps.com/svn/hail/trunk'}
+    YAML.expects(:load_file).with(@workbench.config_file).returns(config)
+    
+    @workbench.read_configuration
+    
+    @workbench.original.should.be.kind_of(Hail::Repository)
+    @workbench.clone.should.be.kind_of(Hail::Repository)
+    
+    @workbench.original.location.should == config['original']
+    @workbench.clone.location.should == config['clone']
+  end
+  
+  it "should init" do
+    @workbench.expects(:ensure_directory)
+    @workbench.expects(:write_configuration)
+    @workbench.expects(:get_repositories)
+    @workbench.expects(:sync_repositories)
+    @workbench.init
+  end
+  
+  it "should update" do
+    @workbench.expects(:read_configuration)
+    @workbench.expects(:sync_repositories)
+    @workbench.update
   end
 end

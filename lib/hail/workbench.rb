@@ -30,6 +30,12 @@ module Hail
       File.join(directory, 'config.yml')
     end
     
+    def read_configuration
+      config = YAML.load_file(config_file)
+      original.location = config['original']
+      clone.location = config['clone']
+    end
+    
     def write_configuration
       File.open(config_file, 'w') do |file|
         file.write(to_hash.to_yaml)
@@ -63,12 +69,27 @@ module Hail
       system(command)
     end
     
+    def init
+      ensure_directory
+      write_configuration
+      get_repositories
+      sync_repositories
+    end
+    
+    def update
+      read_configuration
+      sync_repositories
+    end
+    
     def self.init(options={})
       workbench = new(options)
-      workbench.ensure_directory
-      workbench.write_configuration
-      workbench.get_repositories
-      workbench.sync_repositories
+      workbench.init
+      workbench
+    end
+    
+    def self.update(options={})
+      workbench = new(options)
+      workbench.update
       workbench
     end
     

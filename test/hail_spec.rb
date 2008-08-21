@@ -52,12 +52,24 @@ describe "Hail, invoked from the commandline" do
     Hail::Workbench.expects(:init).with(options)
     Hail.run('init --name hail git://github.com/Fingertips/hail.git https://fngtps.com/svn/hail/trunk .'.split(' '))
   end
+  
+  it "should parse a basic update invocation" do
+    options = {:directory => 'hail-workbench'}
+    Hail::Workbench.expects(:update).with(options)
+    Hail.run('update hail-workbench'.split(' '))
+  end
 end
 
 describe "Hail, when running a command" do
   it "should initialize a new Workbench on init" do
     options = {:command => 'init'}
     Hail::Workbench.expects(:init).with(options)
+    Hail.run_command(options)
+  end
+  
+  it "should update a Workbench on update" do
+    options = {:command => 'update'}
+    Hail::Workbench.expects(:update).with(options)
     Hail.run_command(options)
   end
 end

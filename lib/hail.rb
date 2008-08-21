@@ -21,13 +21,20 @@ module Hail
         options[:directory] = rest.shift
       end
       Workbench.init(options)
+    elsif command == 'update'
+      unless rest.blank?
+        options[:directory] = rest.shift
+      end
+      Workbench.update(options)
+    elsif command.blank?
+      puts "Please specify a command"
     end
   end
   
   def self.run(args)
     options = {}
     opts = OptionParser.new do |opts|
-      opts.banner = 'Usage: hail [options] <command> [repository1] [respository2]'
+      opts.banner = 'Usage: hail [options] <init|update> [repository1] [respository2]'
       
       opts.on( "-n", "--name [NAME]", String,
                "Set the name for the workbench" ) do |n|
