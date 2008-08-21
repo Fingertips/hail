@@ -1,12 +1,12 @@
 module Kernel
-  mattr_accessor :allow_system
-  self.allow_system = false
+  mattr_accessor :allow_backtick
+  self.allow_backtick = false
   
-  alias original_system system
+  alias original_backtick `
   
-  def system(*args)
-    if allow_system
-      original_system(*args)
+  def `(*args)
+    if allow_backtick
+      original_backtick(*args)
     else
       raise RuntimeError, "You're trying to do a system call, which is probably not a very good idea in a test."
     end

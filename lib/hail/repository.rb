@@ -10,8 +10,7 @@ module Hail
     
     def scm
       unless scm = self.class.recognize_scm(directory)
-        needs_location!('recognize the scm type without a working directory')
-        scm = location.ends_with?('git') ? 'git' : 'svn'
+        scm = location.ends_with?('git') ? 'git' : 'svn' if location
       end
       scm
     end
@@ -39,6 +38,40 @@ module Hail
       end
     end
     
+    def put(commit_message='')
+      needs_directory!('commit changes')
+      
+      case scm
+      when 'git'
+        execute "cd #{directory}; git commit -a -v -m '#{commit_message}'; git push origin master"
+      when 'svn'
+        execute "cd #{directory}; svn add `svn status | grep -e \"^\?\" | cut -c 8-`"
+        execute "cd #{directory}; for file in `svn status | grep -e \"^\!\" | cut -c 8-`; do svn remove --force '$file' &> /dev/null done"
+        execute "cd #{directory}; svn commit -m '#{commit_message}'"
+      end
+    end
+    
+    def revision
+      if directory or location
+        case scm
+        when 'git'
+          begin
+            lastlog = execute "cd #{directory}; git log -n 1 --no-color --pretty=oneline"
+            lastlog.strip.split(' ').first
+          rescue NoMethodError
+            nil
+          end
+        when 'svn'
+          begin
+            lastlog = execute "cd #{directory}; svn log -r HEAD"
+            lastlog.strip.split("\n")[1].split(' ').first[1..-1]
+          rescue NoMethodError
+            nil
+          end
+        end
+      end
+    end
+    
     def needs_directory!(perform_action)
       raise ArgumentError, "You have to specify a directory in order to #{perform_action}." if directory.blank?
     end
@@ -48,7 +81,7 @@ module Hail
     end
     
     def execute(command)
-      system(command)
+      `#{command}`
     end
     
     def self.recognize_scm(directory)

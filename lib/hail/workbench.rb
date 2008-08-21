@@ -45,11 +45,30 @@ module Hail
       clone.get
     end
     
+    def sync_repositories
+      original.update
+      rsync
+      clone.put("Updated to #{original.revision}.")
+    end
+    
+    def rsync
+      execute "rsync -av --exclude-from='#{excludes_filename}' #{original.directory}/ #{clone.directory}"
+    end
+    
+    def excludes_filename
+      File.join(::Hail::APP_ROOT, 'data', 'excludes')
+    end
+    
+    def execute(command)
+      system(command)
+    end
+    
     def self.init(options={})
       workbench = new(options)
       workbench.ensure_directory
       workbench.write_configuration
       workbench.get_repositories
+      workbench.sync_repositories
       workbench
     end
     

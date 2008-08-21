@@ -16,6 +16,7 @@ describe "Workbench" do
   
   it "should initialize a new workbench on disk" do
     Hail::Repository.any_instance.stubs(:execute)
+    Hail::Workbench.any_instance.stubs(:execute)
     
     workbench = Hail::Workbench.init(:name => 'hail', :original => 'git://github.com/Fingertips/hail.git', :clone => 'https://fngtps.com/svn/hail/trunk')
     File.exist?(workbench.directory).should == true
@@ -75,5 +76,30 @@ describe "A Workbench" do
   
   it "should have a configuration hash" do
     @workbench.to_hash.should.not.be.empty
+  end
+  
+  it "should get repositories" do
+    @workbench.original.expects(:get)
+    @workbench.clone.expects(:get)
+    @workbench.get_repositories
+  end
+  
+  it "should sync repositories" do
+    @workbench.original.expects(:update)
+    @workbench.original.stubs(:revision).returns('b264a3c8836311974620d7be7a8edca1730027bb')
+    @workbench.expects(:rsync)
+    @workbench.clone.expects(:put).with("Updated to b264a3c8836311974620d7be7a8edca1730027bb.")
+    @workbench.sync_repositories
+  end
+  
+  it "should rsync original to clone" do
+    @workbench.expects(:execute).with("rsync -av --exclude-from='#{@workbench.excludes_filename}' #{@workbench.original.directory}/ #{@workbench.clone.directory}")
+    @workbench.rsync
+  end
+  
+  it "should know where the file with rsync excludes are" do
+    @workbench.excludes_filename.should.start_with(Hail::APP_ROOT)
+    @workbench.excludes_filename.should.end_with('excludes')
+    File.exists?(@workbench.excludes_filename).should == true
   end
 end

@@ -8,6 +8,7 @@ require 'hail/repository'
 
 module Hail
   VERSION = '0.6.0'
+  APP_ROOT = File.expand_path('../../', __FILE__)
   
   def self.run_command(options={})
     command = options.delete(:command)
