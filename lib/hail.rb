@@ -34,12 +34,9 @@ module Hail
   def self.run(args)
     options = {}
     opts = OptionParser.new do |opts|
-      opts.banner = 'Usage: hail [options] <init|update> [repository1] [respository2]'
-      
-      opts.on( "-n", "--name [NAME]", String,
-               "Set the name for the workbench" ) do |n|
-        options[:name] = n
-      end
+      opts.banner = "Usage: hail [options] init <repository1> <respository2> [workbench-directory]\n" +
+      "       hail [options] update"
+      opts.separator ""
       
       opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
         options[:verbose] = v
