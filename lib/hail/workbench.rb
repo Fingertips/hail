@@ -57,7 +57,7 @@ module Hail
     end
     
     def sync_repositories
-      execute "rsync -av --exclude-from='#{excludes_filename}' #{original.directory}/ #{clone.directory}"
+      execute "rsync -av --delete --exclude-from='#{excludes_filename}' #{original.directory}/ #{clone.directory}"
     end
     
     def put_clone

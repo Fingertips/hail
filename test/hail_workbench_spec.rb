@@ -94,7 +94,7 @@ describe "A Workbench" do
   end
   
   it "should sync repositories" do
-    @workbench.expects(:execute).with("rsync -av --exclude-from='#{@workbench.excludes_filename}' #{@workbench.original.directory}/ #{@workbench.clone.directory}")
+    @workbench.expects(:execute).with("rsync -av --delete --exclude-from='#{@workbench.excludes_filename}' #{@workbench.original.directory}/ #{@workbench.clone.directory}")
     @workbench.sync_repositories
   end
   
