@@ -52,8 +52,8 @@ module Hail
         execute_in_directory "git add ."
         execute_in_directory "git commit -a -v -m '#{commit_message}'; git push origin master"
       when 'svn'
-        execute_in_directory "svn add `svn status | grep -e \"^\?\" | cut -c 8-`"
-        execute_in_directory "for file in `svn status | grep -e \"^\!\" | cut -c 8-`; do svn remove --force '$file' &> /dev/null done"
+        execute_in_directory "svn add `svn status | grep -e \"^\\?\" | cut -c 8-`"
+        execute_in_directory "for file in `svn status | grep -e \"^\\!\" | cut -c 8-`; do svn remove --force $file; done"
         execute_in_directory "svn commit -m '#{commit_message}'"
       end
     end
